@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="com.atguigu.crm.mappers.SalesPlanMapper">
+	
+	<update id="savePlanResult">
+		update sales_plan
+		set plan_result = #{result}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from sales_plan where id = #{id}
+	</delete>
+	
+	<select id="getAllPlan" resultType="com.atguigu.crm.entity.SalesPlan">
+		select id ,plan_date AS "date",plan_result AS "result",todo  from sales_plan p where p.chance_id = #{id}
+	</select>
+	
+	<update id="updatePlan">
+		update  sales_plan set todo = #{todo} where id = #{id}
+	</update>
+	
+	<select id="getSalesPlanByPlanId" resultType="com.atguigu.crm.entity.SalesPlan">
+		select * from sales_plan where id=#{id}
+	</select>
+	
+	<insert id="savePlan">
+		<selectKey order="BEFORE" keyColumn="id" keyProperty="id" resultType="long">
+			select crm_seq.nextval from dual
+		</selectKey>
+		insert into sales_plan(id,plan_date,todo,chance_id)
+		values(#{id},#{date},#{todo},#{chance.id})
+		
+	</insert>
+	
+	<update id="dispatch">
+		update sales_chances
+		set designee_id=#{designee.id},designee_date=#{designeeDate},status=#{status}
+		where id=#{id}
+	</update>
+	
+	<update id="update">
+		update sales_chances
+		set source=#{source},cust_name=#{custName},title=#{title},rate=#{rate},contact=#{contact},contact_tel=#{contactTel},description=#{description}
+		where id=#{id}
+	</update>
+	
+	
+	<insert id="save">
+		insert into sales_chances(id,source,cust_name,title,rate,contact,contact_tel,description,created_user_id,create_date,status)
+		values(crm_seq.nextval,#{source},#{custName},#{title},#{rate},#{contact},#{contactTel},#{description},#{createBy.id},#{createDate},#{status})
+	</insert> 
+	<select id="getContent" resultType="com.atguigu.crm.entity.SalesChance">
+		select *
+		from(
+			select rownum rn,id,source,cust_name,title,rate,contact,contact_tel,description,created_user_id,create_date,status
+			from sales_chances
+			where status != #{status} 
+			AND created_user_id = #{createBy.id}
+		)
+		<![CDATA[
+			where rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElements" resultType="long">
+		select count(id)
+		from sales_chances
+		where status != #{status} 
+		AND created_user_id = #{createBy.id}
+	</select>
+	
+	
+</mapper>

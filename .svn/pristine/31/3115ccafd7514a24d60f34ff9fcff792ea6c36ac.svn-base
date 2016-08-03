@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="com.atguigu.crm.mappers.SalesChanceMapper">
+	
+	
+	
+	<update id="dispatch">
+		update sales_chances
+		set designee_id=#{designee.id},designee_date=#{designeeDate},status=#{status}
+		where id=#{id}
+	</update>
+	
+	<update id="update">
+		update sales_chances
+		set source=#{source},cust_name=#{custName},title=#{title},rate=#{rate},contact=#{contact},contact_tel=#{contactTel},description=#{description}
+		where id=#{id}
+	</update>
+	
+	<!-- <select id="getSalesChanceById" resultType="com.atguigu.crm.entity.SalesChance">
+		select id,source,cust_name,title,rate,contact,contact_tel,description,create_date,created_user_id,designee_id
+		from sales_chances
+		where id=#{id}
+	</select> -->
+	
+	<select id="getSalesChanceById" resultType="com.atguigu.crm.entity.SalesChance">
+		select s.id,s.contact,s.contact_tel,s.create_date,s.cust_name,s.description,
+		s.designee_date,s.rate,s.source,s.status,s.title,s.created_user_id as "createBy.id",s.designee_id as "designee.id"
+		from sales_chances s
+		where id = #{id}
+	</select>
+	
+	<!-- <select id="getSalesChanceById" resultType="com.atguigu.crm.entity.SalesChance">
+		select s.id,source,cust_name,title,rate,contact,contact_tel,description,create_date,designee_id,u.name AS "createBy.name"
+		from sales_chances s
+		left outer join users u
+		on s.created_user_id = u.id
+		where s.id=#{id}
+	</select> -->
+	
+	<select id="getDesigneeNameByDesigneeId" resultType="com.atguigu.crm.entity.SalesChance">
+		select u.name AS "designee.name"
+		from users u
+		where u.id=#{designee.id}
+	</select>
+	
+	<delete id="delete">
+		delete from sales_chances
+		where id=#{id}
+	</delete>
+	
+	<insert id="save">
+		insert into sales_chances(id,source,cust_name,title,rate,contact,contact_tel,description,created_user_id,create_date,status)
+		values(crm_seq.nextval,#{source},#{custName},#{title},#{rate},#{contact},#{contactTel},#{description},#{createBy.id},#{createDate},#{status})
+	</insert>
+	<!-- <insert id="save">
+		INSERT INTO sales_chances(id, source, cust_name, rate, title, contact, contact_tel, description, status, created_user_id, create_date)
+		VALUES(crm_seq.nextval,#{source},#{custName},#{rate},#{title},#{contact},#{contactTel},#{description},#{status},#{createBy.id},#{createDate})
+	</insert> -->
+	
+	<select id="getContent" resultType="com.atguigu.crm.entity.SalesChance">
+		select *
+		from(
+			select rownum rn,id,source,cust_name,title,rate,contact,contact_tel,description,created_user_id,create_date,status
+			from sales_chances
+			where status = #{status} 
+			AND created_user_id = #{createBy.id}
+		)
+		<![CDATA[
+			where rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElements" resultType="long">
+		select count(id)
+		from sales_chances
+		where status = #{status} 
+		AND created_user_id = #{createBy.id}
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,86 @@
+package com.atguigu.crm.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.atguigu.crm.entity.SalesChance;
+import com.atguigu.crm.entity.User;
+import com.atguigu.crm.mappers.SalesChanceMapper;
+import com.atguigu.crm.orm.Page;
+
+@Service
+public class SalesChanceService {
+
+	@Autowired
+	private SalesChanceMapper salesChanceMapper;
+
+	@Transactional(readOnly = true)
+	public Page<SalesChance> getPage(int pageNo, User createBy) {
+
+		Page<SalesChance> page = new Page<>();
+
+		page.setPageNo(pageNo);
+
+		Map<String,Object> params = new HashMap<>();
+		
+		params.put("status", 1);
+		
+		params.put("createBy", createBy);
+		
+		int totalElements = (int) salesChanceMapper.getTotalElements(params);
+
+		page.setTotalElements(totalElements);
+
+//		int fromIndex = (page.getPageNo() - 1) * page.getPageSize() + 1;
+//		int endIndex = fromIndex + page.getPageSize();
+		
+		
+		
+		int fromIndex = (page.getPageNo() - 1 ) * page.getPageSize() + 1;
+		int endIndex = fromIndex + page.getPageSize();
+		
+		params.put("fromIndex", fromIndex);
+		params.put("endIndex", endIndex);
+		
+		List<SalesChance> content = salesChanceMapper.getContent(params);
+
+		page.setContent(content);
+		
+		return page;
+
+	}
+
+	public void input(SalesChance chance) {
+		chance.setStatus(1);
+		salesChanceMapper.save(chance);
+		
+	}
+
+	public void delete(Long id) {
+		salesChanceMapper.delete(id);
+		
+	}
+
+	public SalesChance getSalesChanceById(Long id) {
+		return salesChanceMapper.getSalesChanceById(id);
+	}
+
+	public void update(SalesChance chance) {
+		salesChanceMapper.update(chance);
+		
+	}
+	/**
+	 * 去更新指派人和指派时间
+	 * @param chance
+	 */
+	public void dispatch(SalesChance chance) {
+		salesChanceMapper.dispatch(chance);
+		
+	}
+
+}

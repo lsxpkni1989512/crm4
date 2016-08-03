@@ -1,0 +1,8 @@
+3. 使用 easyui tree:
+
+2. 搭建 SSM 的开发环境:
+1). 加入 Spring
+2). 加入 SpringMVC
+3). 加入 mybatis
+
+1. 使用的技术: Spring、SpringMVC、mybatis、shiro、ajax、easyui、jfreechart、poi、quartz...

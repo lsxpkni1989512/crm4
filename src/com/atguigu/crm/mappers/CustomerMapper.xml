@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="com.atguigu.crm.mappers.CustomerMapper">
+	
+	<delete id="delete">
+		update  customers c
+		set c.state = '删除'
+		where id = #{id}
+	</delete>
+	
+	<update id="update">
+		update customers c
+		set c.name = #{name},c.region = #{region},c.manager_id  = #{manager.id},c.customer_level = #{level},c.state = #{state},
+				c.satify = #{satify}, c.credit = #{credit},c.address = #{address},c.zip = #{zip},c.tel = #{tel},c.fax = #{fax},c.websit = #{websit},c.licence_no = #{licenceNo}, c.chief = #{chief}, c.bankroll = #{bankroll}, 
+				c.turnover = #{turnover}, c.bank = #{bank}, c.bank_account = #{bankAccount}, c.local_tax_no = #{localTaxNo}, c.national_tax_no = #{nationalTaxNo}
+		where c.id = #{id}
+	</update>
+	
+	<select id="getCustById" resultType="com.atguigu.crm.entity.Customer">
+		select c.id, c.no,c.name,c.region,c.manager_id AS "manager.id",c.customer_level AS "level",c.state,
+				c.satify, c.credit,c.address,c.zip,c.tel,c.fax,c.websit,c.licence_no, c.chief, c.bankroll, 
+				c.turnover, c.bank, c.bank_account, c.local_tax_no, c.national_tax_no
+		from customers c
+		inner join contacts co
+		on co.id = c.manager_id
+		where c.id = #{id} and c.state != '删除'
+	</select>
+	
+	<select id="getAllManagers" resultType="com.atguigu.crm.entity.Contact">
+		select name, id
+		from contacts co
+	</select>
+
+	<select id="getAllCredits" resultType="java.lang.String">
+		select item AS "credit"
+		from dicts
+		where type = '信用度'
+	</select>
+
+	<select id="getAllSatify" resultType="java.lang.String">
+		select item AS "satify"
+		from dicts
+		where type = '满意度'
+	</select>
+
+	<select id="getAllLevels" resultType="java.lang.String">
+		select item AS "level"
+		from dicts
+		where type = '客户等级'
+	</select>
+	
+	<select id="getAllRegions" resultType="java.lang.String">
+		select item AS "region"
+		from dicts
+		where type = '地区'
+	</select>
+
+	<select id="getContent" resultType="com.atguigu.crm.entity.Customer">
+		
+		SELECT *
+		FROM(
+			select rownum rn,c.id, c.no, c.name, c.region,  co.name AS "manager.name", c.customer_level AS "level", c.state
+			from customers c
+			inner join contacts co
+			on co.id = c.manager_id
+			<where>
+				<if test="name != null">
+					c.name LIKE #{name}
+				</if>
+				<if test="region != null">
+					AND region LIKE #{region}
+				</if>
+				<if test="managerName != null">
+					AND co.name LIKE #{managerName}
+				</if>
+				<if test="level != null">
+					AND c.customer_level LIKE #{level}
+				</if>
+				<if test="state != null">
+					AND c.state LIKE #{state}
+				</if>
+			</where>
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+
+	<select id="getTotalElements" resultType="long">
+		select count(c.id)
+		from customers c
+		inner join contacts co
+		on co.id = c.manager_id
+		<where>
+			<if test="name != null">
+				c.name LIKE #{name}
+			</if>
+			<if test="region != null">
+				AND region LIKE #{region}
+			</if>
+			<if test="managerName != null">
+				AND co.name LIKE #{managerName}
+			</if>
+			<if test="level != null">
+				AND c.customer_level LIKE #{level}
+			</if>
+			<if test="state != null">
+				AND c.state LIKE #{state}
+			</if>
+		</where>
+	</select>
+</mapper>

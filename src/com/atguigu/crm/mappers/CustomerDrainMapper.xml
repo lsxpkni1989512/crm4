@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="com.atguigu.crm.mappers.CustomerDrainMapper">
+
+	<insert id="save">
+		update customer_drains cd
+		set delay = delay + '`'#{delay}
+		where id=#{id}
+	</insert>
+
+	<select id="getCustDrainById" resultType="com.atguigu.crm.entity.CustomerDrain">
+		select rownum rn,cd.id,c.name AS "customer.name",  co.name AS "customer.manager.name", cd.status,
+							cd.drain_date,cd.last_order_date,cd.reason, cd.delay AS "cd.delay"
+		from customer_drains cd
+		inner join customers c
+		on cd.customer_id = c.id
+		inner join contacts co
+		on co.id = c.manager_id
+		where cd.id = #{id}
+	</select>
+
+	<select id="getContent" resultType="com.atguigu.crm.entity.CustomerDrain">
+		
+		SELECT *
+		FROM(
+			select rownum rn,cd.id, c.no AS "customer.no", c.name AS "customer.name",  co.name AS "customer.manager.name", cd.status,
+							cd.drain_date,cd.last_order_date,cd.reason
+			from customer_drains cd
+			inner join customers c
+			on cd.customer_id = c.id
+			inner join contacts co
+			on co.id = c.manager_id
+			<where>
+				<if test="customerName != null">
+					c.name LIKE #{customerName}
+				</if>
+				<if test="customerManagerName != null">
+					AND co.name LIKE #{customerManagerName}
+				</if>
+			</where>
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+
+	<select id="getTotalElements" resultType="long">
+		select count(cd.id)
+		from customer_drains cd
+		inner join customers c
+		on cd.customer_id = c.id
+		inner join contacts co
+		on co.id = c.manager_id
+		<where>
+			<if test="customerName != null">
+					c.name LIKE #{customerName}
+				</if>
+				<if test="customerManagerName != null">
+					AND co.name LIKE #{customerManagerName}
+				</if>
+		</where>
+	</select>
+</mapper>

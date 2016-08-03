@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.crm.mappers.ReportMapper">
+	
+	<select id="getCustomerToalOrderMoneyContent" resultType="java.util.Map">
+		SELECT *
+		FROM(
+			SELECT rownum rn, temp.*
+			FROM(
+				SELECT c.name AS "name", sum(p.price * oi.item_count) AS "total.money"
+				FROM customers c
+				INNER JOIN orders o
+				ON c.id = o.customer_id
+				INNER JOIN order_items oi
+				ON o.id = oi.order_id
+				INNER JOIN products p
+				ON p.id = oi.product_id
+				<where>
+					<if test="name != null">
+						c.name LIKE #{name}
+					</if>
+					<if test="minOrderDate != null">
+						AND o.order_date >= #{minOrderDate}
+					</if>
+					<if test="maxOrderDate != null">
+						<![CDATA[
+						AND o.order_date <= #{maxOrderDate}
+						]]>
+					</if>
+				</where>
+				GROUP BY c.name
+			) temp
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getCustomerToalOrderMoneyCount" resultType="long">
+		SELECT count(DISTINCT c.id)
+		FROM customers c
+		INNER JOIN orders o
+		ON c.id = o.customer_id
+		INNER JOIN order_items oi
+		ON o.id = oi.order_id
+		INNER JOIN products p
+		ON p.id = oi.product_id
+		<where>
+			<if test="name != null">
+				c.name LIKE #{name}
+			</if>
+			<if test="minOrderDate != null">
+				AND o.order_date >= #{minOrderDate}
+			</if>
+			<if test="maxOrderDate != null">
+				<![CDATA[
+				AND o.order_date <= #{maxOrderDate}
+				]]>
+			</if>
+		</where>
+	</select>
+	
+</mapper>

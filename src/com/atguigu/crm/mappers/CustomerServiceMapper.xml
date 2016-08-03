@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="com.atguigu.crm.mappers.CustomerServiceMapper">
+	
+	
+	<select id="getArchiveEntityById" resultType="com.atguigu.crm.entity.CustomerService">
+		select cs.id,service_type,service_title,c.name AS "customer.name",service_state,service_request,u.name AS "createdby.name",
+				create_date,allot_date,deal_date,service_deal,deal_result,satisfy
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.id = #{id}
+	</select>
+	
+	<select id="getContentArchive" resultType="com.atguigu.crm.entity.CustomerService">
+		select *
+		from(
+			select rownum rn,temp.*
+			from(
+				select cs.id,service_type,service_title,c.name AS "customer.name",u.name AS "createdby.name",create_date
+				from customer_services cs
+				inner join customers c
+				on cs.customer_id = c.id
+				inner join users u
+				on cs.created_id = u.id
+				where cs.service_state = '已归档'
+				<if test="serviceType != null">
+					AND cs.service_type LIKE #{serviceType}
+				</if>
+				<if test="serviceTitle != null">
+					AND cs.service_title LIKE #{serviceTitle}
+				</if>
+				<if test="customerName != null">
+					AND c.name LIKE #{customerName}
+				</if>
+				<if test="minCreateDate != null">
+					AND cs.create_date >= #{minCreateDate}
+				</if>
+				<if test="maxCreateDate != null">
+					<![CDATA[
+					AND cs.create_date <= #{maxCreateDate}
+					]]>
+				</if>
+			) temp
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElementsArchive" resultType="long">
+		select count(cs.id)
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.service_state = '已归档'
+		<if test="serviceType != null">
+			AND service_type LIKE #{serviceType}
+		</if>
+		<if test="serviceTitle != null">
+			AND cs.service_title LIKE #{serviceTitle}
+		</if>
+		<if test="customerName != null">
+			AND c.name LIKE #{customerName}
+		</if>
+		<if test="minCreateDate != null">
+			AND cs.create_date >= #{minCreateDate}
+		</if>
+		<if test="maxCreateDate != null">
+			<![CDATA[
+			AND cs.create_date <= #{maxCreateDate}
+			]]>
+		</if>
+	</select>
+	
+	<update id="updateFeedbacl">
+		update customer_services 
+		set deal_result = #{dealResult},satisfy = #{satisfy},service_state = '已归档'
+		where id = #{id}
+	</update>
+	
+	<select id="getFeedbackEntityById" resultType="com.atguigu.crm.entity.CustomerService">
+		select cs.id,service_type,service_title,c.name AS "customer.name",service_state,service_request,u.name AS "createdby.name",
+				create_date,allot_date,deal_date,service_deal
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.id = #{id}
+	</select>
+	
+	<select id="getContentFeedBack" resultType="com.atguigu.crm.entity.CustomerService">
+		select *
+		from(
+			select rownum rn,temp.*
+			from(
+				select cs.id,service_type,service_title,c.name AS "customer.name",u.name AS "createdby.name",create_date
+				from customer_services cs
+				inner join customers c
+				on cs.customer_id = c.id
+				inner join users u
+				on cs.created_id = u.id
+				where cs.service_state = '已处理'
+				<if test="serviceType != null">
+					AND cs.service_type LIKE #{serviceType}
+				</if>
+				<if test="serviceTitle != null">
+					AND cs.service_title LIKE #{serviceTitle}
+				</if>
+				<if test="customerName != null">
+					AND c.name LIKE #{customerName}
+				</if>
+				<if test="minCreateDate != null">
+					AND cs.create_date >= #{minCreateDate}
+				</if>
+				<if test="maxCreateDate != null">
+					<![CDATA[
+					AND cs.create_date <= #{maxCreateDate}
+					]]>
+				</if>
+			) temp
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElementsFeedBack" resultType="long">
+		select count(cs.id)
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.service_state = '已处理'
+		<if test="serviceType != null">
+			AND service_type LIKE #{serviceType}
+		</if>
+		<if test="serviceTitle != null">
+			AND cs.service_title LIKE #{serviceTitle}
+		</if>
+		<if test="customerName != null">
+			AND c.name LIKE #{customerName}
+		</if>
+		<if test="minCreateDate != null">
+			AND cs.create_date >= #{minCreateDate}
+		</if>
+		<if test="maxCreateDate != null">
+			<![CDATA[
+			AND cs.create_date <= #{maxCreateDate}
+			]]>
+		</if>
+	</select>
+	<update id="updateDeal">
+		update customer_services 
+		set deal_date = #{dealDate},service_deal = #{serviceDeal},service_state = '已处理'
+		where id = #{id}
+	</update>
+	
+	<select id="getEntityById" resultType="com.atguigu.crm.entity.CustomerService">
+		select cs.id,service_type,service_title,c.name AS "customer.name",service_state,service_request,u.name AS "createdby.name",
+				create_date,allot_date
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.id = #{id}
+	</select>
+	
+	<select id="getAllotNameById" resultType="com.atguigu.crm.entity.CustomerService">
+		select u.name AS "allotTo.name"
+		from customer_services cs
+		inner join users u
+		on cs.allot_id = u.id
+		where cs.id = #{id}
+	</select>
+	
+	<select id="getContentDeal" resultType="com.atguigu.crm.entity.CustomerService">
+		select *
+		from(
+			select rownum rn,temp.*
+			from(
+				select cs.id,service_type,service_title,c.name AS "customer.name",u.name AS "createdby.name",create_date
+				from customer_services cs
+				inner join customers c
+				on cs.customer_id = c.id
+				inner join users u
+				on cs.created_id = u.id
+				where cs.service_state = '已分配'
+				<if test="serviceType != null">
+					AND cs.service_type LIKE #{serviceType}
+				</if>
+				<if test="serviceTitle != null">
+					AND cs.service_title LIKE #{serviceTitle}
+				</if>
+				<if test="customerName != null">
+					AND c.name LIKE #{customerName}
+				</if>
+				<if test="minCreateDate != null">
+					AND cs.create_date >= #{minCreateDate}
+				</if>
+				<if test="maxCreateDate != null">
+					<![CDATA[
+					AND cs.create_date <= #{maxCreateDate}
+					]]>
+				</if>
+			) temp
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElementsDeal" resultType="long">
+		select count(cs.id)
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.service_state = '已分配'
+		<if test="serviceType != null">
+			AND service_type LIKE #{serviceType}
+		</if>
+		<if test="serviceTitle != null">
+			AND cs.service_title LIKE #{serviceTitle}
+		</if>
+		<if test="customerName != null">
+			AND c.name LIKE #{customerName}
+		</if>
+		<if test="minCreateDate != null">
+			AND cs.create_date >= #{minCreateDate}
+		</if>
+		<if test="maxCreateDate != null">
+			<![CDATA[
+			AND cs.create_date <= #{maxCreateDate}
+			]]>
+		</if>
+	</select>
+	
+	<update id="allot">
+		update customer_services cs
+		set cs.service_state = '已分配',cs.allot_id = #{allotTo.id},cs.allot_date = #{allotDate}
+		where cs.id = #{id}
+	</update>
+	
+	<select id="getContent" resultType="com.atguigu.crm.entity.CustomerService">
+		select *
+		from(
+			select rownum rn,temp.*
+			from(
+				select cs.id,service_type,service_title,c.name AS "customer.name",u.name AS "createdby.name",create_date
+				from customer_services cs
+				inner join customers c
+				on cs.customer_id = c.id
+				inner join users u
+				on cs.created_id = u.id
+				where cs.service_state = '新创建'
+				<if test="serviceType != null">
+					AND cs.service_type LIKE #{serviceType}
+				</if>
+				<if test="serviceTitle != null">
+					AND cs.service_title LIKE #{serviceTitle}
+				</if>
+				<if test="customerName != null">
+					AND c.name LIKE #{customerName}
+				</if>
+				<if test="minCreateDate != null">
+					AND cs.create_date >= #{minCreateDate}
+				</if>
+				<if test="maxCreateDate != null">
+					<![CDATA[
+					AND cs.create_date <= #{maxCreateDate}
+					]]>
+				</if>
+			) temp
+		)
+		<![CDATA[
+		WHERE rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElements" resultType="long">
+		select count(cs.id)
+		from customer_services cs
+		inner join customers c
+		on cs.customer_id = c.id
+		inner join users u
+		on cs.created_id = u.id
+		where cs.service_state = '新创建'
+		<if test="serviceType != null">
+			AND service_type LIKE #{serviceType}
+		</if>
+		<if test="serviceTitle != null">
+			AND cs.service_title LIKE #{serviceTitle}
+		</if>
+		<if test="customerName != null">
+			AND c.name LIKE #{customerName}
+		</if>
+		<if test="minCreateDate != null">
+			AND cs.create_date >= #{minCreateDate}
+		</if>
+		<if test="maxCreateDate != null">
+			<![CDATA[
+			AND cs.create_date <= #{maxCreateDate}
+			]]>
+		</if>
+	</select>
+	
+	<select id="getAllCS" resultType="com.atguigu.crm.entity.CustomerService">
+		select * from customer_services cs where cs.service_state = '新创建'
+	</select>
+	
+	<select id="getAllCustomers" resultType="com.atguigu.crm.entity.Customer">
+		select * from customers
+	</select>
+	
+	<insert id="save">
+		<selectKey order="BEFORE"  keyColumn="id" keyProperty="id" resultType="long">
+			select crm_seq.nextval from dual
+		</selectKey>
+		insert into customer_services(id,create_date,service_title,service_type,created_id,customer_id,service_request,service_state)
+		values(#{id},#{createDate},#{serviceTitle},#{serviceType},#{createdby.id},#{customer.id},#{serviceRequest},#{serviceState})
+	</insert>
+	
+</mapper>
