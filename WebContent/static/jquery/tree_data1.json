@@ -41,7 +41,7 @@
 			"id":131,
 			"text":"服务创建",
 			"attributes":{    
-	            "url":"/crm2/service/toAdd"  
+	            "url":"/crm2/service/用的是数据库里的树"  
 	        }
 		},{
 			"id":132,

@@ -29,4 +29,8 @@ public interface SalesChanceMapper {
 
 	void stop(Long chanceId);
 
+	long getTotalElements2(Map<String, Object> params);
+
+	List<SalesChance> getContent2(Map<String, Object> params);
+
 }

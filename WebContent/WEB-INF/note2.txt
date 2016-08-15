@@ -2,8 +2,8 @@
 
 drop user atguigu cascade;
 
-create user atguigu identified by atguigu;
-grant connect, resource, dba to atguigu;
+create user lsxpkni identified by lsxpkni;
+grant connect, resource, dba to lsxpkni;
 
 2. 创建序列:
 

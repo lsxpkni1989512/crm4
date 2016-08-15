@@ -11,7 +11,7 @@
 <% 
 	if(queryString != null && !queryString.trim().equals("")){
 		queryString = "&" + queryString;
-		getJspContext().setAttribute("queryString", queryString);
+		getJspContext().setAttribute("queryString ", queryString);
 	}
 %>
 

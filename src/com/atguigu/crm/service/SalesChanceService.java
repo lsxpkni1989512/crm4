@@ -3,16 +3,20 @@ package com.atguigu.crm.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.atguigu.crm.entity.Product;
 import com.atguigu.crm.entity.SalesChance;
 import com.atguigu.crm.entity.User;
 import com.atguigu.crm.mappers.SalesChanceMapper;
 import com.atguigu.crm.mappers.UserMapper;
 import com.atguigu.crm.orm.Page;
+import com.atguigu.crm.orm.PropertyFilter;
 
 @Service
 public class SalesChanceService {
@@ -137,6 +141,46 @@ public class SalesChanceService {
 	public void stop(Long chanceId) {
 		salesChanceMapper.stop(chanceId);
 		
+	}
+
+	private Map<String, Object> parseRequestParams2MybatisParams(
+			Map<String, Object> requestParams) {
+		List<PropertyFilter> filters = PropertyFilter.parseRequestParamsToPropertyFilters(requestParams);
+		
+		Map<String, Object> params = new HashMap<>();
+		
+		for(PropertyFilter filter: filters){
+			params.put(filter.getPropertyName(), filter.getPropertyVal());
+		}
+		
+		return params;
+	}
+	
+	public Page<SalesChance> getPage2(int pageNo, Map<String, Object> params1) {
+		/*User user = (User) params1.get("createBy");*/
+		
+		
+
+		Map<String, Object> params = parseRequestParams2MybatisParams(params1);
+		Page<SalesChance> page = new Page<>();
+		
+	/*	params.put("createById", user.getId());*/
+		
+		int totalElements = (int) salesChanceMapper.getTotalElements2(params);
+		page.setTotalElements(totalElements);
+		page.setPageNo(pageNo);
+		
+		//若需要查詢當前額頁面對應的 Content, 則還需要傳入類似于 fromInde 和 endIndex 的變量.
+		int fromIndex = (page.getPageNo() - 1) * page.getPageSize() + 1;
+		int endIndex = fromIndex + page.getPageSize();
+		params.put("fromIndex", fromIndex);
+		params.put("endIndex", endIndex);
+		
+		
+		
+		List<SalesChance> content = salesChanceMapper.getContent2(params);
+		page.setContent(content);
+		return page;
 	}
 	
 }

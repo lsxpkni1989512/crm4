@@ -7,9 +7,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 <mapper namespace="com.atguigu.crm.mappers.SalesChanceMapper">
 	
+	<select id="getContent2" resultType="com.atguigu.crm.entity.SalesChance">
+		select *
+		from(
+			select rownum rn,id,source,cust_name,title,rate,contact,contact_tel,description,created_user_id,create_date,status
+			from sales_chances
+			<include refid="chanceQueryCondition"></include>
+		)
+		<![CDATA[
+			where rn >= #{fromIndex} AND rn < #{endIndex}
+		]]>
+	</select>
+	
+	<select id="getTotalElements2" resultType="long">
+		select count(id)
+		from sales_chances
+		<include refid="chanceQueryCondition"></include>
+	</select>
+	
 	
 	<sql id="chanceQueryCondition">
-		WHERE status = #{status} AND created_user_id = #{createById}
+		WHERE status = 1 
 		<if test="custName != null">
 			AND cust_name LIKE #{custName}
 		</if>

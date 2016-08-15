@@ -44,7 +44,7 @@ public class SalesPlanHandler {
 		return "2";
 	}
 	
-	@RequestMapping("/execution/{id}")
+	@RequestMapping(value="/execution/{id}",method=RequestMethod.GET)
 	public String toExecutUI(@PathVariable("id") Long chanceId,Map<String,Object> map){
 		SalesChance chance = salesChanceService.getSalesChanceAndPlansById(chanceId);
 		

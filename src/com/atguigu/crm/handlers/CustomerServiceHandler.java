@@ -217,7 +217,7 @@ public class CustomerServiceHandler {
 		return queryString.toString();
 	}
 
-	@RequestMapping("/toAdd")
+	@RequestMapping(value="/toAdd",method=RequestMethod.GET)
 	private String toAdd(Map<String, Object> map, CustomerService cs) {
 
 		cs.setCreateDate(new Date());

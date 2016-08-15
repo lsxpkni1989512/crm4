@@ -102,11 +102,11 @@
 				return false;
 			}
 			
-			$("#execute").click(function(){
+			/* $("#execute").click(function(){
 				var id = $(":hidden[name='chance.id']").val();
 				window.location.href = "${ctp}/plan/execution?id=" + id;
 				return false;
-			}); 
+			});  */
 			
 		})
 	</script>
@@ -115,7 +115,7 @@
 <body class="main">
 	<span class="page_title">制定计划</span>
 	<div class="button_bar">
-		<button class="common_button" id="execute">
+		<button class="common_button" id="execute" onclick="window.location.href='${ctp }/plan/execution/${chance.id}'">
 			执行计划
 		</button>
 		<button class="common_button" onclick="javascript:history.go(-1);">
